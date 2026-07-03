@@ -42,7 +42,7 @@ package riscv_pkg;
   // funct3 (instr[14:12]) -- I-type ALU-immediate
   // (shares encodings with R-type funct3 above: addi/slti/etc. reuse F3_* names)
   // slli/srli/srai use F3_SLL / F3_SRL_SRA plus F7_NORMAL / F7_ALT on funct7[5]
-  // (only bit 5 of funct7 is architecturally defined for immediate shifts;
+  // (only bit 5 of funct7 is architecturally defined for immediate shifts
   //  bits [6] and [4:0] of the funct7 field are reserved/shamt in RV32I)
   // ---------------------------------------------------------------------------
 
@@ -107,6 +107,7 @@ package riscv_pkg;
   // Immediate format select -- drives the 3:1 (I/S/B) + U + J mux inside imm_gen.sv
   // ---------------------------------------------------------------------------
   typedef enum logic [2:0] {
+    // R-type has no immediete
     IMM_I = 3'b000,
     IMM_S = 3'b001,
     IMM_B = 3'b010,
@@ -119,4 +120,4 @@ package riscv_pkg;
   // ---------------------------------------------------------------------------
   localparam int XLEN = 32; // RV32I data/address width
 
-endpackage : riscv_pkg
+endpackage : riscv_pkg;
