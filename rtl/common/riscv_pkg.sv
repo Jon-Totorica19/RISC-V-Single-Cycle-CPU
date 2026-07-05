@@ -120,4 +120,4 @@ package riscv_pkg;
   // ---------------------------------------------------------------------------
   localparam int XLEN = 32; // RV32I data/address width
 
-endpackage : riscv_pkg;
+endpackage : riscv_pkg
