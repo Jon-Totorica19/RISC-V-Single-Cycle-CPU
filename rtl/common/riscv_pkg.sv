@@ -104,18 +104,6 @@ package riscv_pkg;
   localparam logic [3:0] ALU_SRA  = 4'b1001;
 
   // ---------------------------------------------------------------------------
-  // Immediate format select -- drives the 3:1 (I/S/B) + U + J mux inside imm_gen.sv
-  // ---------------------------------------------------------------------------
-  typedef enum logic [2:0] {
-    // R-type has no immediete
-    IMM_I = 3'b000,
-    IMM_S = 3'b001,
-    IMM_B = 3'b010,
-    IMM_U = 3'b011,
-    IMM_J = 3'b100
-  } imm_sel_e;
-
-  // ---------------------------------------------------------------------------
   // Common widths
   // ---------------------------------------------------------------------------
   localparam int XLEN = 32; // RV32I data/address width
