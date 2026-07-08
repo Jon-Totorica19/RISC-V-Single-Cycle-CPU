@@ -13,8 +13,22 @@ module alu_control (
         unique case (ALUOp)
             2'b00: // Load_Store -- ADD
                 alu_ctrl = ALU_ADD;
-            2'b01: // Branch -- SUB
-                alu_ctrl = ALU_SUB;
+            2'b01: begin // Branch -- Decode funct3 
+                case (funct3)
+                    F3_BEQ, F3_BNE: // SUB
+                        alu_ctrl = ALU_SUB;
+
+                    F3_BLT, F3_BGE: // SLT
+                        alu_ctrl = ALU_SLT;
+
+                    F3_BLTU, F3_BGEUL: // SLTU
+                        alu_ctrl = ALU_SLTU;
+
+                    default: // SUB
+                        alu_ctrl = ALU_SUB;
+                endcase
+            end
+
             2'b10: begin// R-type / I-ALU -- decide by funct3,7
                 casez ({funct7_5, funct3}) //casez is used for wildcard matching with the ? dontcare
                     4'b0000: // ADD
