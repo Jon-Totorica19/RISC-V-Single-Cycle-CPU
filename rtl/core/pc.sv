@@ -9,7 +9,7 @@ module pc (
 
     always_ff @(posedge clk) begin
         if (rst) 
-        pc_addrs <= 0;
+        pc_addr <= 0;
         else
         pc_addr <= next_pc;
     end
