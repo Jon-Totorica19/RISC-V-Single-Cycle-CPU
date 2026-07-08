@@ -24,6 +24,10 @@ obj_dir/
 results.xml
 sim_build/
 
+# Assembler object and elf files
+*.o
+*.elf
+
 # Editor
 .vscode/
 *.swp
