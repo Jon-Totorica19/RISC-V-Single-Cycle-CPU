@@ -21,7 +21,7 @@ module alu_control (
                     F3_BLT, F3_BGE: // SLT
                         alu_ctrl = ALU_SLT;
 
-                    F3_BLTU, F3_BGEUL: // SLTU
+                    F3_BLTU, F3_BGEU: // SLTU
                         alu_ctrl = ALU_SLTU;
 
                     default: // SUB
