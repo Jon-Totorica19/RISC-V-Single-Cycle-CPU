@@ -5,8 +5,6 @@ module pc (
     output logic [31:0] pc_addr
 );
 
-    initial pc_addr = 32'd0;
-
     always_ff @(posedge clk) begin
         if (rst) 
         pc_addr <= 0;
