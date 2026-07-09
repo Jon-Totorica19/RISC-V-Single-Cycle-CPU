@@ -109,7 +109,7 @@
        inputs inside; sel at top center
   ══════════════════════════════════════════ -->
   <rect x="612" y="292" width="45" height="102" rx="2" class="mux"/>
-  <text x="634" y="303" text-anchor="middle" class="xs">sel</text>
+  <text x="634" y="303" text-anchor="middle" class="xs">sel[1:0]</text>
   <text x="617" y="318" text-anchor="start"  class="sl">0</text>
   <text x="634" y="344" text-anchor="middle" font-size="9" font-weight="bold" fill="#111">MUX</text>
   <text x="617" y="348" text-anchor="start"  class="sl">1</text>
@@ -164,7 +164,7 @@
        MUX WB  3:1   (1130, 288, 45, 102)
   ══════════════════════════════════════════ -->
   <rect x="1130" y="288" width="45" height="102" rx="2" class="mux"/>
-  <text x="1152" y="300" text-anchor="middle" class="xs">sel</text>
+  <text x="1152" y="300" text-anchor="middle" class="xs">sel[1:0]</text>
   <text x="1135" y="314" text-anchor="start"  class="sl">0</text>
   <text x="1152" y="340" text-anchor="middle" font-size="9" font-weight="bold" fill="#111">MUX</text>
   <text x="1135" y="344" text-anchor="start"  class="sl">1</text>
@@ -177,7 +177,7 @@
        MUX PC  4:1   (44, 480, 45, 112)
   ══════════════════════════════════════════ -->
   <rect x="44" y="480" width="45" height="112" rx="2" class="mux"/>
-  <text x="66" y="492"  text-anchor="middle" class="xs">sel</text>
+  <text x="66" y="492"  text-anchor="middle" class="xs">sel[1:0]</text>
   <text x="49" y="504"  text-anchor="start"  class="sl">0</text>
   <text x="66" y="533"  text-anchor="middle" font-size="9" font-weight="bold" fill="#111">MUX</text>
   <text x="49" y="520"  text-anchor="start"  class="sl">1</text>
@@ -248,10 +248,11 @@
   <!-- rd1: reg_file right → MUX A input 2 (y=378) -->
   <polyline points="552,303 574,303 574,378 612,378" class="dw"/>
 
-  <!-- pc_addr → MUX A input 1 (y=348) -->
-  <polyline points="202,344 598,344 612,344" class="dw"/>
+  <!-- pc_addr → MUX A input 1 (y=348), branch from junction at 202,352 -->
+  <polyline points="202,352 598,352 598,348 612,348" class="dw"/>
 
-  <!-- 0 → MUX A input 0 (y=318) — short stub -->
+  <!-- 32'b0 → MUX A input 0 (y=318) — constant for LUI -->
+  <text x="598" y="321" text-anchor="end" font-size="8" fill="#1d4ed8">32'b0</text>
   <line x1="600" y1="318" x2="612" y2="318" class="dw"/>
 
   <!-- rd2: reg_file right → MUX B input 0 (y=452) -->
@@ -285,9 +286,8 @@
   <!-- ALU result → MUX PC input 0 / JALR (deep bottom loop) -->
   <polyline points="866,325 866,636 28,636 28,504 44,504" class="dw"/>
 
-  <!-- ALU zero → branch_taken stub -->
-  <line x1="828" y1="355" x2="856" y2="355" stroke="#1d4ed8" stroke-width="2" fill="none"/>
-  <text x="858" y="351" class="sl" fill="#1d4ed8">zero → branch_taken</text>
+  <!-- zero: ALU right → long route around → branch_logic right input -->
+  <polyline points="828,358 880,358 880,624 118,624 118,447" class="dw"/>
 
   <!-- data_mem readData → MUX WB input 1 (y=344) -->
   <polyline points="1058,299 1102,299 1102,344 1130,344" class="dw"/>
@@ -306,6 +306,17 @@
 
   <!-- write_back: MUX WB right → reg_file WriteData (bottom loop) -->
   <polyline points="1175,344 1210,344 1210,706 390,706 390,396 408,396" class="dw"/>
+
+  <!-- ══════════════════════════════════════════
+       branch_logic   (44, 424, 74, 44)
+       Evaluates branch_taken from Branch + zero + funct3
+  ══════════════════════════════════════════ -->
+  <rect x="44" y="424" width="74" height="44" rx="2" class="cmod"/>
+  <text x="81" y="440" text-anchor="middle" font-size="8" font-weight="bold" fill="#b91c1c">branch</text>
+  <text x="81" y="451" text-anchor="middle" font-size="8" font-weight="bold" fill="#b91c1c">_logic</text>
+  <text x="50" y="434" text-anchor="start"  font-size="7" fill="#b91c1c">Branch</text>
+  <text x="116" y="449" text-anchor="end"   font-size="7" fill="#374151">zero</text>
+  <text x="81" y="465" text-anchor="middle" font-size="7" fill="#b91c1c">branch_taken</text>
 
   <!-- ════════════════════════════════════════════════
                      CONTROL SIGNALS
@@ -330,14 +341,25 @@
   <!-- MemToReg → MUX WB sel top (x=1152) -->
   <polyline points="530,154 530,216 1152,216 1152,288" class="cw"/>
 
-  <!-- Jump → MUX WB sel top (offset) + drives MUX PC -->
+  <!-- Jump → MUX WB sel top; also branches left → MUX PC sel -->
+  <circle cx="545" cy="154" r="4" fill="#b91c1c"/>
   <polyline points="545,154 545,220 1154,220 1154,288" class="cw"/>
+  <polyline points="545,154 545,212 36,212 36,480 44,480" class="cw"/>
 
-  <!-- Branch → MUX PC sel top (x=66), route left via y=166 -->
-  <polyline points="420,154 420,166 66,166 66,480" class="cw"/>
+  <!-- Branch → branch_logic top, route left via y=166 -->
+  <polyline points="420,154 420,166 66,166 66,424" class="cw"/>
 
-  <!-- MUX A sel: is_lui/is_auipc decoded from opcode (stub) -->
-  <line x1="634" y1="292" x2="634" y2="280" class="cw"/>
-  <text x="636" y="278" text-anchor="start" font-size="8" fill="#b91c1c">opcode</text>
+  <!-- branch_taken → MUX PC sel -->
+  <polyline points="66,468 66,480" class="cw"/>
+
+  <!-- MUX A sel: is_lui/is_auipc, branch from instr bus at x=390,y=248 → right → down into mux top -->
+  <circle cx="390" cy="248" r="4" class="jn"/>
+  <polyline points="390,248 634,248 634,292" class="cw"/>
+  <text x="490" y="244" text-anchor="middle" font-size="8" fill="#b91c1c">is_lui / is_auipc</text>
+
+  <!-- is_jalr: decoded from opcode, route LEFT from instr bus at y=255 → down → MUX PC top -->
+  <circle cx="390" cy="255" r="4" class="jn"/>
+  <polyline points="390,255 30,255 30,480 52,480" class="cw"/>
+  <text x="200" y="251" text-anchor="middle" font-size="8" fill="#b91c1c">is_jalr</text>
 
 </svg>
