@@ -8,6 +8,8 @@ A single-cycle RV32I processor implemented in SystemVerilog. Each instruction co
 
 The datapath follows the classic single-cycle RISC-V design: fetch, decode, execute, memory, and writeback all happen within a single clock cycle.
 
+![Datapath](docs/datapath.svg)
+
 ```
          ┌─────┐    ┌──────────┐    ┌──────────────┐
 clk ────►│ PC  │───►│ instr_mem│───►│ control_unit │
