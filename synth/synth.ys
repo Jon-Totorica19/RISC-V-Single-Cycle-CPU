@@ -4,7 +4,7 @@ read_verilog -sv ../rtl/core/alu_control.sv
 read_verilog -sv ../rtl/core/reg_file.sv
 read_verilog -sv ../rtl/core/imm_gen.sv
 read_verilog -sv ../rtl/core/pc.sv
-read_verilog -sv ../rtl/core/data_mem.sv
+read_verilog -sv ../rtl/core/control_unit.sv
 read_verilog -sv ../rtl/core/riscv_core.sv
 
 hierarchy -top riscv_core
