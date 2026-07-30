@@ -13,9 +13,11 @@ VERILOG_SOURCES += \
 	$(PWD)/../../rtl/core/instr_mem.sv \
 	$(PWD)/../../rtl/core/data_mem.sv \
 	$(PWD)/../../rtl/core/control_unit.sv \
-	$(PWD)/../../rtl/core/riscv_core.sv
+	$(PWD)/../../rtl/core/riscv_core.sv \
+	$(PWD)/../../rtl/core/riscv_top.sv
+	
 
-TOPLEVEL = riscv_core
+TOPLEVEL = riscv_top
 
 MODULE = test_riscv_core
 

@@ -1,5 +1,6 @@
 // Data Memory. On MemRead, output the value at input address. On MemWrite, write the input value at the input address
 
+(* keep *)
 module data_mem(
     input logic MemRead, MemWrite, clk,
     input logic [31:0] writeData, addr, 

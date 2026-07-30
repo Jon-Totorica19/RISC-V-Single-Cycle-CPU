@@ -1,5 +1,6 @@
 // Instruction Memory: Takes an address as input from PC and outputs the next instrction of the program
 
+(* keep *)
 module instr_mem (
     input logic [31:0] addr,
     output logic [31:0] instr

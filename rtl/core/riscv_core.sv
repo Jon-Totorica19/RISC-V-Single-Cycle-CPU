@@ -1,19 +1,22 @@
-// Single Cycle RISC-V Core. Wiring of all modules
+// Single Cycle RISC-V Core. Instantiate and wire logical functional units
 
 import riscv_pkg::*;
 
+(* keep *)
 module riscv_core (
-    input logic clk, rst
+    input logic clk, rst,
+    input [31:0] instr, readData, 
+    output logic MemRead, MemWrite,
+    output logic [31:0] instr_addr, data_addr, writeData
 );
 
     logic [31:0] pc_addr, next_pc, pc_plus4, pc_target;
-    logic [31:0] instr;
     logic [31:0] rd1, rd2;
     logic [31:0] imm;
     logic [31:0] alu_a, alu_b, alu_result;
     logic        zero;
-    logic [31:0] read_data, write_back;
-    logic        RegWrite, ALUSrc, MemWrite, MemRead, MemToReg, Branch, Jump;
+    logic [31:0] write_back;
+    logic        RegWrite, ALUSrc, MemToReg, Branch, Jump;
     logic [1:0]  ALUOp;
     logic [3:0]  alu_ctrl;
     logic is_jalr;
@@ -28,10 +31,7 @@ module riscv_core (
         .pc_addr(pc_addr)
     );
 
-    instr_mem instr_mem (
-        .addr(pc_addr),
-        .instr(instr)
-    );
+    assign instr_addr = pc_addr;
 
     control_unit control_unit (
         .opcode(instr[6:0]),
@@ -63,6 +63,8 @@ module riscv_core (
         .rd2(rd2)
     );
 
+    assign writeData = rd2;
+
     imm_gen imm_gen (
         .instr(instr),
         .imm(imm)
@@ -86,17 +88,10 @@ module riscv_core (
         .zero(zero)
     );
 
-    data_mem data_mem (
-        .MemRead(MemRead),
-        .MemWrite(MemWrite),
-        .clk(clk),
-        .writeData(rd2),
-        .addr(alu_result), 
-        .readData(read_data)
-    );
+    assign data_addr = alu_result;
 
     // 3:1 MUX - Select Writeback Source. JAL/JALR link register, alu_result, or read data memory
-    assign write_back = Jump ? pc_plus4 : MemToReg ? read_data : alu_result;
+    assign write_back = Jump ? pc_plus4 : MemToReg ? readData : alu_result;
 
     // Increment PC
     assign pc_plus4 = pc_addr + 4;

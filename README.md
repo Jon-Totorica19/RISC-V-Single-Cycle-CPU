@@ -200,3 +200,16 @@ This produces `.o`, `.elf`, and `.hex` files. Only `.hex` files are loaded by th
 | cocotb | Python testbench framework |
 | GTKWave | Waveform viewer |
 | riscv64-unknown-elf | RISC-V assembler and linker |
+
+## Synthesis & Static Timing Analysis
+Synthesized with Yosys 0.67 targeting the SkyWater SKY130 (sky130_fd_sc_hd, typical corner) standard cell library; timing analyzed with OpenSTA 3.1.0.
+
+**Netlist**: 4,389 standard cells total across the core and its 6 submodules (alu, alu_control, control_unit, imm_gen, pc, reg_file). reg_file dominates at ~2,700 cells (31 writable 32-bit registers plus read/write mux logic — x0 is correctly optimized away since it's never written), followed by the ALU at ~1,000 cells.
+
+**Critical path**: register file read → ALUSrc mux → ALU (signed SLT comparison) → branch-taken decision → next-PC mux → PC register. Data arrival time: 14.00ns.
+
+**Max frequency**: ≈70.9MHz (14.00ns critical path + 0.11ns setup margin). Confirmed violating at a 100MHz (10ns) test constraint (slack -4.11ns).
+
+**Why this is the critical path**: this is the datapath for a taken branch instruction (BLT/BGE-style signed comparison) — the longest logic chain in the design, because it requires a full 32-bit subtraction (same carry-propagation cost as addition) plus extra logic to correctly handle the signed-overflow edge case, all of which must resolve before the branch-taken decision and PC update can happen in the same clock cycle. This is the textbook single-cycle bottleneck, and it's the direct point of comparison against the pipelined core, where this computation gets split across multiple stages instead of forced into one cycle.
+
+**Known limitation**: this analysis treats readData (from data_mem) as an idealized, zero-delay input, since data_mem is synthesized separately from the core. A full-system synthesis was attempted to capture this, but instr_mem's contents (populated only via testbench force during simulation, not synthesizable RTL) get constant-folded by the optimizer, which collapses the branch/jump decode logic to a fixed case and invalidates the resulting timing, and is why this analysis is scoped to the core in isolation.
